@@ -39,6 +39,12 @@ const DefaultLogoBasedOnChain = ({ chain }) => {
         source={{ uri: "https://cryptologos.cc/logos/polygon-matic-logo.png" }}
         style={styles.logo}></Image>
     );
+  else if (chain == "0x80001")
+    return (
+      <Image
+        source={{ uri: "https://cryptologos.cc/logos/polygon-matic-logo.png" }}
+        style={styles.logo}></Image>
+    );
   else
     return (
       <Image

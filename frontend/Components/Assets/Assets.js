@@ -9,12 +9,21 @@ import {
   SafeAreaView,
   ScrollView,
   Text,
+  Button,
+  Modal,
+  Pressable,
 } from "react-native";
 import NativeBalance from "./NativeBalance";
 import ERC20Balance from "./ERC20Balance";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faUniversity } from "@fortawesome/free-solid-svg-icons";
-import { Card } from "@ui-kitten/components";
+import { Card, withStyles } from "@ui-kitten/components";
+import { createStackNavigator } from "@react-navigation/stack";import {
+  NavigationContainer,
+  getFocusedRouteNameFromRoute,
+} from "@react-navigation/native";
+import ChatModal from "../Chat/ChatModal";
+import { FlexStyleProps } from "@ui-kitten/components/devsupport";
 
 export default function Assets() {
   const { Moralis } = useMoralis();
@@ -24,24 +33,9 @@ export default function Assets() {
       <ScrollView>
         <View style={styles.viewContainer}>
           <Text style={styles.headerText} category="h4">
-            🏦 Assets
+            Assets
           </Text>
-
-          <Text style={styles.chainText} category="c2">
-            Ethereum
-          </Text>
-          <NativeBalance chain="0x1" />
-          <ERC20Balance></ERC20Balance>
-          <Text style={styles.chainText} category="c2">
-            Binance Smart Chain
-          </Text>
-          <NativeBalance chain="0x38" />
-          <ERC20Balance chain="0x38"></ERC20Balance>
-          <Text style={styles.chainText} category="c2">
-            Polygon Chain
-          </Text>
-          <NativeBalance chain="0x89" />
-          <ERC20Balance chain="0x89"></ERC20Balance>
+        <NativeBalance chain="0xa869"/>
         </View>
       </ScrollView>
     </SafeAreaView>

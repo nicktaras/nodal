@@ -1,18 +1,18 @@
 /* eslint-disable functional/no-throw-statement */
-import WalletConnect from '@walletconnect/client';
+import WalletConnect from "@walletconnect/client";
 import {
   ICreateSessionOptions,
   IWalletConnectSession,
-} from '@walletconnect/types';
-import deepmerge from 'deepmerge';
-import {KeyValueStorage, ReactNativeStorageOptions} from 'keyvaluestorage';
-import * as React from 'react';
-import {Linking, Platform, Modal} from 'react-native';
-import useDeepCompareEffect from 'use-deep-compare-effect';
+} from "@walletconnect/types";
+import deepmerge from "deepmerge";
+import { KeyValueStorage, ReactNativeStorageOptions } from "keyvaluestorage";
+import * as React from "react";
+import { Linking, Platform, Modal } from "react-native";
+import useDeepCompareEffect from "use-deep-compare-effect";
 
-import {defaultRenderQrcodeModal, formatWalletServiceUrl} from '../constants';
-import {WalletConnectContext} from '../contexts';
-import {useMobileRegistry, useWalletConnectContext} from '../hooks';
+import { defaultRenderQrcodeModal, formatWalletServiceUrl } from "../constants";
+import { WalletConnectContext } from "../contexts";
+import { useMobileRegistry, useWalletConnectContext } from "../hooks";
 import {
   ConnectorEvents,
   RenderQrcodeModalCallback,
@@ -20,7 +20,7 @@ import {
   WalletConnectContextValue,
   WalletConnectProviderProps,
   WalletService,
-} from '../types';
+} from "../types";
 
 type State = {
   readonly uri?: string;
@@ -47,28 +47,29 @@ export default function WalletConnectProvider({
 
   const intermediateValue = React.useMemo(
     (): WalletConnectContextValue => deepmerge(parentContext, extras),
-    [parentContext, extras],
+    [parentContext, extras]
   );
 
   const renderQrcodeModal = React.useMemo(
     () =>
-      typeof maybeRenderQrcodeModal === 'function'
+      typeof maybeRenderQrcodeModal === "function"
         ? (maybeRenderQrcodeModal as RenderQrcodeModalCallback)
         : defaultRenderQrcodeModal,
-    [maybeRenderQrcodeModal],
+    [maybeRenderQrcodeModal]
   );
 
   const open = React.useCallback(
     async (uri: string, cb: unknown): Promise<unknown> => {
-      if (Platform.OS === 'android') {
-        const canOpenURL = await Linking.canOpenURL(uri);
-        if (!canOpenURL) {
-          // Redirect the user to download a wallet.
-          Linking.openURL('https://walletconnect.org/wallets');
-          throw new Error('No wallets found.');
-        }
-        await Linking.openURL(uri);
-      }
+      //NOTE: commented this original code from wallet connect module
+      // if (Platform.OS === "android") {
+      //   const canOpenURL = await Linking.canOpenURL(uri);
+      //   if (!canOpenURL) {
+      //     // Redirect the user to download a wallet.
+      //     Linking.openURL("https://walletconnect.org/wallets");
+      //     throw new Error("No wallets found.");
+      //   }
+      //   await Linking.openURL(uri);
+      // }
       setState({
         uri,
         visible: true,
@@ -76,13 +77,13 @@ export default function WalletConnectProvider({
       });
       return undefined;
     },
-    [setState],
+    [setState]
   );
 
   const close = React.useCallback((): unknown => {
-    setState(currentState => {
-      const {cb} = currentState;
-      setTimeout(() => typeof cb === 'function' && cb(), 0);
+    setState((currentState) => {
+      const { cb } = currentState;
+      setTimeout(() => typeof cb === "function" && cb(), 0);
       return {
         uri: undefined,
         visible: false,
@@ -97,20 +98,20 @@ export default function WalletConnectProvider({
       open,
       close,
     }),
-    [open, close],
+    [open, close]
   );
 
-  const {storageOptions, redirectUrl} = intermediateValue;
+  const { storageOptions, redirectUrl } = intermediateValue;
 
   const createStorage = React.useCallback(
     (storageOptions: ReactNativeStorageOptions): KeyValueStorage => {
       return new KeyValueStorage(storageOptions);
     },
-    [],
+    []
   );
 
   const [storage, setStorage] = React.useState(() =>
-    createStorage(storageOptions as ReactNativeStorageOptions),
+    createStorage(storageOptions as ReactNativeStorageOptions)
   );
 
   useDeepCompareEffect(() => {
@@ -119,18 +120,18 @@ export default function WalletConnectProvider({
 
   const sessionStorageKey = React.useMemo(
     () => `${storageOptions.rootStorageKey}:session`,
-    [storageOptions],
+    [storageOptions]
   );
 
   const walletServiceStorageKey = React.useMemo(
     () => `${storageOptions.rootStorageKey}:walletService`,
-    [storageOptions],
+    [storageOptions]
   );
 
   const connectToWalletService = React.useCallback(
     async (walletService: WalletService, uri?: string): Promise<void> => {
       //NOTE: Implemented deep linking inside connectToWalletService callback
-      if (Platform.OS === 'android') {
+      if (Platform.OS === "android") {
         // const canOpenURL = await Linking.canOpenURL(uri);
         // if (!canOpenURL) {
         //   // Redirect the user to download a wallet.
@@ -140,15 +141,15 @@ export default function WalletConnectProvider({
         await Linking.openURL(uri);
       }
 
-      if (typeof uri !== 'string' || !uri.length) {
-        return Promise.reject(new Error('Invalid uri.'));
+      if (typeof uri !== "string" || !uri.length) {
+        return Promise.reject(new Error("Invalid uri."));
       }
       const maybeRedirectUrl =
-        typeof redirectUrl === 'string'
+        typeof redirectUrl === "string"
           ? `&redirectUrl=${encodeURIComponent(redirectUrl)}`
-          : '';
+          : "";
       const connectionUrl = `${formatWalletServiceUrl(
-        walletService,
+        walletService
       )}/wc?uri=${encodeURIComponent(uri)}${maybeRedirectUrl}`;
 
       if (await Linking.canOpenURL(connectionUrl)) {
@@ -159,19 +160,19 @@ export default function WalletConnectProvider({
           ])) && undefined
         );
       }
-      return Promise.reject(new Error('Unable to open url.'));
+      return Promise.reject(new Error("Unable to open url."));
     },
-    [walletServiceStorageKey, storage, redirectUrl, state],
+    [walletServiceStorageKey, storage, redirectUrl, state]
   );
 
   const [connector, setConnector] = React.useState<WalletConnect | undefined>();
 
   const createConnector = React.useCallback(
     async function shouldCreateConnector(
-      params: WalletConnectContextValue,
+      params: WalletConnectContextValue
     ): Promise<WalletConnect> {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const {storageOptions: _storageOptions, ...extras} = params;
+      const { storageOptions: _storageOptions, ...extras } = params;
       const [
         maybeExistingSession,
         maybeExistingWalletService,
@@ -184,7 +185,7 @@ export default function WalletConnectProvider({
       (!!maybeExistingSession &&
         // // Android does not inherently "know" the provider.
         // // (This information is obscured by the BottomSheet.)
-        Platform.OS === 'android') ||
+        Platform.OS === "android") ||
         !!maybeExistingWalletService;
 
       if (!isResumable) {
@@ -217,20 +218,20 @@ export default function WalletConnectProvider({
         ConnectorEvents.CALL_REQUEST_SENT,
         async (error: unknown) => {
           maybeThrowError(error);
-          if (Platform.OS === 'android') {
-            const {peerMeta} = nextConnector;
-            if (!!peerMeta && typeof peerMeta === 'object') {
-              const [maybeShortName] = `${peerMeta.name || ''}`
+          if (Platform.OS === "android") {
+            const { peerMeta } = nextConnector;
+            if (!!peerMeta && typeof peerMeta === "object") {
+              const [maybeShortName] = `${peerMeta.name || ""}`
                 .toLowerCase()
                 .split(/\s+/);
               if (
-                typeof maybeShortName === 'string' &&
+                typeof maybeShortName === "string" &&
                 !!maybeShortName.length
               ) {
-                const {walletServices} = parentContext;
+                const { walletServices } = parentContext;
                 const [...maybeMatchingServices] = (
                   walletServices || []
-                ).filter(({metadata: {shortName}}) => {
+                ).filter(({ metadata: { shortName } }) => {
                   return `${shortName}`.toLowerCase() === maybeShortName;
                 });
                 if (maybeMatchingServices.length === 1) {
@@ -243,22 +244,22 @@ export default function WalletConnectProvider({
               }
             }
             // On Android, fall back to asking the user to pick the correct application.
-            Linking.openURL('wc:');
-          } else if (Platform.OS !== 'web') {
+            Linking.openURL("wc:");
+          } else if (Platform.OS !== "web") {
             const walletService:
               | WalletService
               | undefined = await storage.getItem(walletServiceStorageKey);
 
             if (!walletService) {
               return maybeThrowError(
-                new Error('Cached WalletService not found.'),
+                new Error("Cached WalletService not found.")
               );
             }
 
             const url = formatWalletServiceUrl(walletService);
             return (await Linking.canOpenURL(url)) && Linking.openURL(url);
           }
-        },
+        }
       );
 
       nextConnector.on(
@@ -266,7 +267,7 @@ export default function WalletConnectProvider({
         async (error: unknown) => {
           maybeThrowError(error);
           await storage.setItem(sessionStorageKey, nextConnector.session);
-        },
+        }
       );
 
       nextConnector.on(ConnectorEvents.DISCONNECT, async (error: unknown) => {
@@ -287,7 +288,7 @@ export default function WalletConnectProvider({
       qrcodeModal,
       setConnector,
       parentContext,
-    ],
+    ]
   );
 
   useDeepCompareEffect(() => {
@@ -317,7 +318,7 @@ export default function WalletConnectProvider({
       walletServices,
       state.uri,
       onDismiss,
-    ],
+    ]
   );
 
   const value = React.useMemo((): WalletConnectContextValue => {
@@ -331,14 +332,14 @@ export default function WalletConnectProvider({
           ...connector,
           connect: async (opts?: ICreateSessionOptions) => {
             if (!walletServices.length) {
-              throw new Error('Mobile registry not yet ready.');
+              throw new Error("Mobile registry not yet ready.");
             } else if (walletServicesError) {
               throw walletServicesError;
             }
             const nextConnector = await createConnector(intermediateValue);
             setConnector(nextConnector);
             const session = await nextConnector.connect(opts);
-            return {connector: nextConnector, session};
+            return { connector: nextConnector, session };
           },
         }),
       };
@@ -362,7 +363,7 @@ export default function WalletConnectProvider({
   return (
     <WalletConnectContext.Provider value={value}>
       {!!children && children}
-      {Platform.OS !== 'android' && renderQrcodeModal(modalProps)}
+      {renderQrcodeModal(modalProps)}
     </WalletConnectContext.Provider>
   );
 }

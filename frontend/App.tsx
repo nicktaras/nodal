@@ -10,9 +10,10 @@ import { LogBox } from "react-native";
 
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import CryptoAuth from "./Components/CryptoAuth";
-import RecentTransactions from "./Components/RecentTransactions/RecentTransactions";
+//import RecentTransactions from "./Components/RecentTransactions/RecentTransactions";
 import Assets from "./Components/Assets/Assets";
-import Transfer from "./Components/Transfer/Transfer";
+import Chat from "./Components/Chat/Chat";
+import Admit from "./Components/Chat/Admit";
 import Profile from "./Components/Profile/Profile";
 import Header from "./Components/Header";
 import NFTAssets from "./Components/NFT/NFTAssets";
@@ -43,40 +44,20 @@ function Home(): JSX.Element {
         options={{
           tabBarLabel: "Assets",
           tabBarIcon: ({ color, focused }) => {
-            return <FontAwesomeIcon icon={faCoins} color={color} size={20} />;
+            return <FontAwesomeIcon icon={faCoins} color={"#5C26FF"} size={20} />;
           },
         }}
         component={Assets}
       />
       <Tab.Screen
-        name="Transactions"
+        name="Admit"
         options={{
-          tabBarLabel: "Transactions",
+          tabBarLabel: "Admit",
           tabBarIcon: ({ color }) => (
-            <FontAwesomeIcon icon={faCreditCard} color={color} size={20} />
+            <FontAwesomeIcon icon={faPaperPlane} color={"#5C26FF"} size={20} />
           ),
         }}
-        component={RecentTransactions}
-      />
-      <Tab.Screen
-        name="NFTAssets"
-        options={{
-          tabBarLabel: "NFTAssets",
-          tabBarIcon: ({ color, focused }) => {
-            return <FontAwesomeIcon icon={faRocket} color={color} size={20} />;
-          },
-        }}
-        component={NFTAssets}
-      />
-      <Tab.Screen
-        name="Transfer"
-        options={{
-          tabBarLabel: "Transfer",
-          tabBarIcon: ({ color }) => (
-            <FontAwesomeIcon icon={faPaperPlane} color={color} size={20} />
-          ),
-        }}
-        component={Transfer}
+        component={Admit}
       />
 
       <Tab.Screen
@@ -84,7 +65,7 @@ function Home(): JSX.Element {
         options={{
           tabBarLabel: "Profile",
           tabBarIcon: ({ color }) => (
-            <FontAwesomeIcon icon={faUser} color={color} size={20} />
+            <FontAwesomeIcon icon={faUser} color={"#5C26FF"} size={20} />
           ),
         }}
         component={Profile}
@@ -93,25 +74,29 @@ function Home(): JSX.Element {
   );
 }
 
+function enterChat(): JSX.Element {
+  return (
+    <Tab.Navigator
+      shifting={false}
+      activeColor="#315399"
+      // inactiveColor="#3e2465"
+      barStyle={{ backgroundColor: "white" }}>
+      <Tab.Screen
+        name="Chat"
+        options={{
+          tabBarLabel: "Chat",
+          tabBarIcon: ({ color }) => (
+            <FontAwesomeIcon icon={faPaperPlane} color={"#5C26FF"} size={20} />
+          ),
+        }}
+        component={Chat}
+      />
+    </Tab.Navigator>
+  );
+}
+
 const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
-function getHeaderTitle(route) {
-  // If the focused route is not found, we need to assume it's the initial screen
-  // This can happen during if there hasn't been any navigation inside the screen
-  // In our case, it's "Feed" as that's the first screen inside the navigator
-  const routeName = getFocusedRouteNameFromRoute(route) ?? "Feed";
-
-  switch (routeName) {
-    case "Assets":
-      return "Assets";
-    case "Transfer":
-      return "Transfer";
-    case "Transactions":
-      return "Transactions";
-    case "Profile":
-      return "Profile";
-  }
-}
 
 function App(): JSX.Element {
   const connector = useWalletConnect();
@@ -139,9 +124,12 @@ function App(): JSX.Element {
           component={Home}
           // Hiding header for Navigation Drawer
           options={{ headerTitle: (props) => <Header /> }}
-          // options={({ route }) => ({
-          //   headerTitle: getHeaderTitle(route),
-          // })}
+        />
+        <Stack.Screen
+          name="Server"
+          component={enterChat}
+          // Hiding header for Navigation Drawer
+          options={{ headerTitle: (props) => <Header /> }}
         />
       </Stack.Navigator>
     </NavigationContainer>

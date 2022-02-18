@@ -1,65 +1,63 @@
-import React, { useState, createRef, useRef, useEffect } from "react";
-import {
-  StyleSheet,
-  TextInput,
-  View,
-  Text,
-  ScrollView,
-  Image,
-  Keyboard,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  Linking,
-  Animated,
-  Dimensions,
-  ImageBackground,
-} from "react-native";
-import {
-  Button,
-  Paragraph,
-  Dialog,
-  Portal,
-  Provider,
-  ActivityIndicator,
-} from "react-native-paper";
-
-import {
-  useMoralis,
-  useMoralisWeb3Api,
-  useMoralisWeb3ApiCall,
-} from "react-moralis";
+import React, { useEffect } from "react";
+import { StyleSheet, View, Text, Image, TouchableOpacity, Animated, Dimensions } from "react-native";
+import { Button, Paragraph, Dialog, Portal, Provider, ActivityIndicator } from "react-native-paper";
+import { useMoralis } from "react-moralis";
+import { Ionicons } from "@expo/vector-icons";
 import { useWalletConnect } from "../WalletConnect";
-import LottieView from "lottie-react-native";
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Animation from "../splashLottie.json";
-
-// import Loader from './Components/Loader';
-const windowWidth = Dimensions.get("window").width;
-const windowHeight = Dimensions.get("window").height;
+const {width, height} = Dimensions.get('screen');
+const Background = ['#EEEEEE', '#EEEEEE', '#EEEEEE', '#EEEEEE', '#EEEEEE',];
+const Screen = [
+  {
+    "Title": "Connect Your Wallet",
+    "Feature": "",
+    "Image": "https://Image.flaticon.com/icons/png/256/3571/3571572.png"
+  },
+  {
+    "Title": "Find Your Community",
+    "Feature": "",
+    "Image": "https://cdn-icons.flaticon.com/png/512/4531/premium/4531344.png?token=exp=1643687952~hmac=c177bea16bbada4577fc46e5131fba33"
+  },
+  {
+    "Title": "Chat with Token Holders",
+    "Feature": "",
+    "Image": "https://cdn-icons-png.flaticon.com/512/4127/4127787.png"
+  },
+  {
+    "Title": "Discover Projects",
+    "Feature": "",
+    "Image": "https://cdn-icons-png.flaticon.com/512/4935/4935359.png"
+  },
+  {
+    "Title": "Welcome to Nodal",
+    "Feature": "",
+    "Image": "https://i.imgur.com/z19GTez.jpg"
+  }
+]
 
 const LoginScreen = ({ navigation }) => {
-  const connector = useWalletConnect();
-  const {
+  const scrollX = React.useRef(new Animated.Value(0)).current;
+  const inputRange = Screen.map((_, i) => i * width);
+  const backgroundColor = scrollX.interpolate({
+    inputRange,
+    outputRange: Background,
+  })
+
+const connector = useWalletConnect();
+
+const {
     authenticate,
     authError,
     isAuthenticating,
     isAuthenticated,
-    logout,
-    Moralis,
-  } = useMoralis();
+} = useMoralis();
 
-  const [userEmail, setUserEmail] = useState("");
-  const [userPassword, setUserPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [errortext, setErrortext] = useState("");
-  const [visible, setVisible] = React.useState(false);
 
-  const showDialog = () => setVisible(true);
+  const [ setVisible ] = React.useState(false);
 
-  const hideDialog = () => setVisible(false);
-
-  const passwordInputRef = createRef();
+  const handleCryptoLoginFake = () => {
+    navigation.replace("DrawerNavigationRoutes");
+  }
 
   const handleCryptoLogin = () => {
     authenticate({ connector })
@@ -82,130 +80,101 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <Provider>
-      <View style={styles.mainBody}>
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{
-            flex: 1,
-            justifyContent: "center",
-            alignContent: "center",
-          }}>
-          <Image
-            style={{ flex: 1, maxWidth: '100%', alignSelf: 'center' }}
-            source={require("../eth.png")}
-          />
-          <View style={{ flex: 1 }}>
-            <KeyboardAvoidingView enabled>
-              <View style={{ alignItems: "center" }}>
-                <LottieView source={Animation} loop autoPlay />
-                <Image
-                  source={require("../moralis-logo.png")}
-                  style={{
-                    width: "50%",
-                    height: 100,
-                    resizeMode: "contain",
-                    margin: 30,
-                  }}
-                />
-              </View>
+        <Animated.View
+          style={[StyleSheet.absoluteFillObject, {
+            backgroundColor
+          }]}
+        />
 
-              <View>
-                {authError && (
-                  <Portal>
-                    <Dialog visible={visible} onDismiss={hideDialog}>
-                      <Dialog.Title>Authentication error:</Dialog.Title>
-                      <Dialog.Content>
-                        <Paragraph>
-                          {authError ? authError.message : ""}
-                        </Paragraph>
-                      </Dialog.Content>
-                      <Dialog.Actions>
-                        <Button onPress={hideDialog}>Done</Button>
-                      </Dialog.Actions>
-                    </Dialog>
-                  </Portal>
-                )}
-                {isAuthenticating && (
-                  <ActivityIndicator animating={true} color={"white"} />
-                )}
-              </View>
 
-              <TouchableOpacity
-                style={styles.buttonStyle}
-                activeOpacity={0.5}
-                onPress={handleCryptoLogin}>
-                <Text style={styles.buttonTextStyle}>Crypto Wallet Login</Text>
-              </TouchableOpacity>
-              <Text
-                style={styles.registerTextStyle}
-                onPress={() =>
-                  Linking.openURL("https://ethereum.org/en/wallets/")
-                }>
-                What are wallets?
-              </Text>
-            </KeyboardAvoidingView>
+
+      <Animated.FlatList
+        data={Screen}
+        scrollEventThrottle={32}
+        showsHorizontalScrollIndicator={false}
+        style={{paddingBottom: height * .25}}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+          {
+            useNativeDriver: false,
+          },
+        )}
+        keyExtractor={item => item.key}
+        pagingEnabled
+        horizontal
+        renderItem={({item, index}) => {
+          return <View style={{width, justifyContent: 'center', height: '100%'}}>
+            <View style={{ alignItems: 'center', justifyContent: 'center'}}>
+              <Image source={{uri: item.Image}} style={{width: width - 64, height: width * 2, top: 48, resizeMode: 'contain'}}/>
+            </View>
+
+
+            <View style={{paddingLeft: 32, bottom: 30}}>
+              <Text style={{alignItems: 'center', color: '#000', fontWeight: '800', fontSize: 28, paddingBottom: 10, paddingLeft: 20,}} numberOfLines={1} adjustsFontSizeToFit>{item.Title}</Text>
+              <Text style={{alignItems: 'center', color: '#000', fontWeight: '400', fontSize: 16}}>{item.Feature}</Text>
+            </View>
           </View>
-        </ScrollView>
-      </View>
+        }}
+      />
+      
+
+        <View style={{flexDirection: 'row', justifyContent: 'center', marginBottom: 32}}>
+          {Screen.map((_, i) => {
+            const inputRange = [(i - 1) * width, i * width, (i + 1) * width];
+            const scale = scrollX.interpolate({
+              inputRange,
+              outputRange: [0.5, 1, 1],
+              extrapolate: 'clamp',
+              justifyContent: "center"
+            })
+            const opacity = scrollX.interpolate({
+              inputRange,
+              outputRange: [0.5, 1, 1],
+              extrapolate: 'clamp',
+              justifyContent: "center"
+            })
+            return <Animated.View
+              style={{
+                backgroundColor: '#5C26FF',
+                borderRadius: 8,
+                height: 16,
+                margin: 4,
+                opacity,
+                justifyContent: "center",
+                transform: [{
+                  scale
+                }],
+                width: 16,
+              }}
+            />
+          })}
+        </View>
+        <TouchableOpacity
+          style={Format.buttonFormat}
+          activeOpacity={0.5}
+          onPress={handleCryptoLogin}
+        >
+          <Ionicons
+            color="#FFFFFF"
+            name="lock-open"
+            size={32}
+            style={{ marginTop: 14 }}
+          />
+        </TouchableOpacity>
     </Provider>
   );
 };
+
 export default LoginScreen;
 
-const styles = StyleSheet.create({
-  mainBody: {
-    flex: 1,
-    justifyContent: "center",
-    backgroundColor: "white",
-    alignContent: "center",
-  },
-  SectionStyle: {
-    flexDirection: "row",
-    height: 40,
-    marginTop: 20,
-    marginLeft: 35,
-    marginRight: 35,
-    margin: 10,
-  },
-  buttonStyle: {
-    backgroundColor: "#7DE24E",
-    borderWidth: 0,
-    color: "#FFFFFF",
-    borderColor: "#7DE24E",
-    height: 40,
+const Format = StyleSheet.create({
+  buttonFormat: {
     alignItems: "center",
-    borderRadius: 30,
-    marginLeft: 35,
-    marginRight: 35,
-    marginTop: 20,
-    marginBottom: 25,
-  },
-  buttonTextStyle: {
-    color: "#FFFFFF",
-    paddingVertical: 10,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  inputStyle: {
-    flex: 1,
-    color: "white",
-    paddingLeft: 15,
-    paddingRight: 15,
-    borderWidth: 1,
-    borderRadius: 30,
-    borderColor: "#dadae8",
-  },
-  registerTextStyle: {
-    color: "black",
-    textAlign: "center",
-    fontWeight: "bold",
-    fontSize: 14,
-    alignSelf: "center",
-    padding: 10,
-  },
-  errorTextStyle: {
-    color: "red",
-    textAlign: "center",
-    fontSize: 14,
+    backgroundColor: "#5C26FF",
+    borderRadius: 16,
+    height: 64,
+    marginBottom: 130,
+    marginLeft: 64,
+    marginRight: 64,
   },
 });

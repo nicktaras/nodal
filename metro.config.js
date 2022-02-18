@@ -1,20 +1,10 @@
-/**
- * Metro configuration for React Native
- * https://github.com/facebook/react-native
- *
- * @format
- */
+const extraNodeModules = require('node-libs-browser');
 
 module.exports = {
-  transformer: {
-    getTransformOptions: async () => ({
-      transform: {
-        experimentalImportSupport: false,
-        inlineRequires: true,
-      },
-    }),
-  },
   resolver: {
-    sourceExts: ['jsx', 'js', 'ts', 'tsx'],
+    extraNodeModules,
+  },
+  transformer: {
+    assetPlugins: ['expo-asset/tools/hashAssetFiles'],
   },
 };
