@@ -18,14 +18,14 @@
 			"url": "https://opensea.io/collection/bufficornbuidlbrigade"
 		}
 	],
-	"0xa1eb40c284c5b44419425c4202fa8dabff31006b": [{
-			"contract": "0xa1eb40c284c5b44419425c4202fa8dabff31006b",
+	"0x22C1f6050E56d2876009903609a2cC3fEf83B415": [{
+			"contract": "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
 			"collection": "POAP",
 			"title": "POAP Home",
 			"url": "https://poap.xyz/"
 		},
 		{
-			"contract": "0xa1eb40c284c5b44419425c4202fa8dabff31006b",
+			"contract": "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
 			"collection": "POAP",
 			"title": "Reddit",
 			"url": "https://www.reddit.com/r/poap"
