@@ -36,5 +36,11 @@
 		"collection": "Ethereum",
 		"title": "Ethereum",
 		"url": "https://ethereum.org/en/"
+	}],
+	"0xb624fde1a972b1c89ec1dad691442d5e8e891469": [{
+		"contract": "0x1",
+		"collection": "Spork",
+		"title": "Spork",
+		"url": "https://ethereum.org/en/"
 	}]
 }
