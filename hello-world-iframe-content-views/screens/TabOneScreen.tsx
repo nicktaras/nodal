@@ -4,6 +4,8 @@ import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 
+import LitJssdk from 'lit-js-sdk';
+
 // TODO - load Apes image + buttons
 // Navigate to views using Iframe data
 
@@ -31,6 +33,8 @@ const views = [
 ];
 
 export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'>) {
+
+  LitJssdk.LoadedInALIT();
 
   function loadView(endpoint:string) {
     navigation.navigate('TabTwo', { endpoint });
